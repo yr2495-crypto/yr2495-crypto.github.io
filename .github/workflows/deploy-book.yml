@@ -1,0 +1,47 @@
+name: deploy-book
+
+# 当 main 或 master 分支有 push 的时候就跑
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write        # 允许把网站内容写到 GitHub Pages
+      id-token: write     # OIDC，用于部署验证
+
+    steps:
+      # 1. 拉取仓库代码
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # 2. 设定 Python 环境
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 3. 安装依赖（用你的 requirements.txt，其中包含 jupyter-book>=1.0.0）
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      # 4. Build the book -> 生成 _build/html
+      - name: Build the book
+        run: |
+          jupyter-book build .
+
+      # 5. 把 HTML 产物打包成 Pages artifact
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "_build/html"
+
+      # 6. 发布到 GitHub Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
