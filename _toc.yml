@@ -3,3 +3,6 @@ root: index
 chapters:
   - file: lecture_16_example
   - file: air_quality_analysis
+  - file: project 2/project_2
+    title: 911 Emergency Demand and Population Differences in NYC
+
